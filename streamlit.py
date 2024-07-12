@@ -52,7 +52,7 @@ def calculate_sip_quarterly(monthly_investment, investment_period, expected_retu
         quarterly_rate = (inflation_adjusted_rate / 100) / 4
     
     invested_amount = monthly_investment *  quarters
-    future_value = (monthly_investment * 3) * ((((1 + quarterly_rate) ** quarters) - 1) / quarterly_rate) * (1 + quarterly_rate)
+    future_value = (monthly_investment ) * ((((1 + quarterly_rate) ** quarters) - 1) / quarterly_rate) * (1 + quarterly_rate)
     
     return invested_amount, future_value
 
