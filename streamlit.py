@@ -64,8 +64,8 @@ if st.button("Calculate"):
     # Create DataFrame for plotting
     periods_per_year = 12 if investment_type == "Monthly" else 4 if investment_type == "Quarterly" else 1
     months = np.arange(1, investment_period * periods_per_year + 1)
-    invested_values = investment_amount_per_period * (months / periods_per_year)
-    future_values = [calculate_sip_returns(monthly_investment, m/periods_per_year, expected_return_rate, adjust_for_inflation, investment_type)[1] for m in months]
+    invested_values = [investment_amount_per_period * (m / periods_per_year) for m in months]
+    future_values = [calculate_sip_returns(monthly_investment, m / periods_per_year, expected_return_rate, adjust_for_inflation, investment_type)[1] for m in months]
     
     start_date = date.today()
     df = pd.DataFrame({
