@@ -167,3 +167,5 @@ if st.button("Calculate"):
 
     # Display the bar chart
     st.altair_chart(bars, use_container_width=True)
+
+# st.info("Note: This calculator assumes a constant rate of return. Actual returns may vary based on market conditions.")
