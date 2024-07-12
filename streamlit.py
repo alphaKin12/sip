@@ -3,11 +3,8 @@ import pandas as pd
 import numpy as np
 import altair as alt
 from datetime import date
-#from streamlit_extras.app_logo import add_logo
 
 st.title(":green[SIP] Calculator :chart_with_upwards_trend:")
-#add_logo("http://placekitten.com/120/120")
-#st.divider()
 
 # Remove Streamlit menu and footer
 st.markdown(
@@ -26,25 +23,37 @@ investment_period = st.slider("Investment Period (Years)", min_value=2, max_valu
 expected_return_rate = st.slider("Expected Annual Return Rate (%)", min_value=6.0, max_value=25.0, value=12.0, step=0.1)
 adjust_for_inflation = st.checkbox("Adjust for Inflation (5% annually)")
 
+# Radio buttons for investment type
+investment_type = st.radio("Choose Investment Type", ["Monthly", "Quarterly", "One-time"])
+
 # Calculate SIP returns
-def calculate_sip_returns(monthly_investment, investment_period, expected_return_rate,adjust_for_inflation):
-    months = investment_period * 12
-    monthly_rate = (expected_return_rate / 100) / 12
+def calculate_sip_returns(monthly_investment, investment_period, expected_return_rate, adjust_for_inflation, investment_type):
+    if investment_type == "Monthly":
+        periods_per_year = 12
+        investment_amount_per_period = monthly_investment
+    elif investment_type == "Quarterly":
+        periods_per_year = 4
+        investment_amount_per_period = monthly_investment * 3  # Quarterly investment
+    elif investment_type == "One-time":
+        periods_per_year = 1
+        investment_amount_per_period = monthly_investment * 12 * investment_period  # One-time investment
+
+    months = investment_period * periods_per_year
+    monthly_rate = (expected_return_rate / 100) / periods_per_year
     
     if adjust_for_inflation:
         # Adjust expected return rate for inflation (5% annually)
         inflation_adjusted_rate = expected_return_rate - 5.0
-        monthly_rate = (inflation_adjusted_rate / 100) / 12
+        monthly_rate = (inflation_adjusted_rate / 100) / periods_per_year
     
-    invested_amount = monthly_investment * months
-    future_value = monthly_investment * ((((1 + monthly_rate) ** months) - 1) / monthly_rate) * (1 + monthly_rate)
-    
+    invested_amount = investment_amount_per_period * (months / periods_per_year)
+    future_value = investment_amount_per_period * ((((1 + monthly_rate) ** months) - 1) / monthly_rate) * (1 + monthly_rate)
     
     return invested_amount, future_value
 
 # Calculate button
 if st.button("Calculate"):
-    invested_amount, future_value = calculate_sip_returns(monthly_investment, investment_period, expected_return_rate,adjust_for_inflation)
+    invested_amount, future_value = calculate_sip_returns(monthly_investment, investment_period, expected_return_rate, adjust_for_inflation, investment_type)
     
     # Display results
     col1, col2, col3 = st.columns(3)
@@ -53,9 +62,10 @@ if st.button("Calculate"):
     col3.metric("Total Value", f"₹{future_value:,.0f}")
        
     # Create DataFrame for plotting
-    months = np.arange(1, investment_period * 12 + 1)
-    invested_values = monthly_investment * months
-    future_values = [calculate_sip_returns(monthly_investment, m/12, expected_return_rate,adjust_for_inflation)[1] for m in months]
+    periods_per_year = 12 if investment_type == "Monthly" else 4 if investment_type == "Quarterly" else 1
+    months = np.arange(1, investment_period * periods_per_year + 1)
+    invested_values = investment_amount_per_period * (months / periods_per_year)
+    future_values = [calculate_sip_returns(monthly_investment, m/periods_per_year, expected_return_rate, adjust_for_inflation, investment_type)[1] for m in months]
     
     start_date = date.today()
     df = pd.DataFrame({
@@ -95,8 +105,8 @@ if st.button("Calculate"):
     st.altair_chart(chart, theme="streamlit", use_container_width=True)
     
     # Create yearly breakdown data
-    yearly_data = df[df.index % 12 == 0].copy()
-    yearly_data['Year'] = yearly_data.index // 12 + 1
+    yearly_data = df[df.index % periods_per_year == 0].copy()
+    yearly_data['Year'] = yearly_data.index // periods_per_year + 1
     yearly_data = yearly_data[['Year', 'Invested Amount', 'Future Value']]
     yearly_data = yearly_data.melt('Year', var_name='Category', value_name='Amount')
 
