@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 import altair as alt
 from datetime import date
-from streamlit_extras.app_logo import add_logo
+#from streamlit_extras.app_logo import add_logo
 
 st.title(":green[SIP] Calculator :chart_with_upwards_trend:")
 #add_logo("http://placekitten.com/120/120")
