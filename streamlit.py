@@ -51,11 +51,10 @@ def calculate_sip_quarterly(monthly_investment, investment_period, expected_retu
         inflation_adjusted_rate = expected_return_rate - 5.0
         quarterly_rate = (inflation_adjusted_rate / 100) / 4
     
-    invested_amount = monthly_investment * quarters
-    future_value = monthly_investment  * ((((1 + quarterly_rate) ** quarters) - 1) / quarterly_rate) * (1 + quarterly_rate)
+    invested_amount = monthly_investment * 3 * quarters
+    future_value = (monthly_investment * 3) * ((((1 + quarterly_rate) ** quarters) - 1) / quarterly_rate) * (1 + quarterly_rate)
     
     return invested_amount, future_value
-
 
 # Calculate SIP returns for One-time Investment
 def calculate_sip_one_time(one_time_investment, investment_period, expected_return_rate, adjust_for_inflation):
@@ -68,7 +67,6 @@ def calculate_sip_one_time(one_time_investment, investment_period, expected_retu
     future_value = one_time_investment * (1 + annual_rate) ** investment_period
     
     return one_time_investment, future_value
-
 
 # Calculate button
 if st.button("Calculate"):
@@ -107,7 +105,7 @@ if st.button("Calculate"):
         'Future Value': future_values
     })
     
-    # Create Altair chart
+    # Create Altair chart for line plot
     brush = alt.selection_interval(encodings=["x"])
     
     base = alt.Chart(df).encode(
@@ -135,7 +133,7 @@ if st.button("Calculate"):
     ).interactive()
 
     # Display the Altair chart with Streamlit theme
-    st.altair_chart(chart, theme="streamlit", use_container_width=True)
+    st.altair_chart(chart, use_container_width=True)
     
     # Create yearly breakdown data
     if investment_type == "Monthly":
@@ -168,6 +166,4 @@ if st.button("Calculate"):
     ).add_selection(click)
 
     # Display the bar chart
-    st.altair_chart(bars, theme="streamlit", use_container_width=True)
-
-#st.info("Note: This calculator assumes a constant rate of return. Actual returns may vary based on market conditions.")
+    st.altair_chart(bars, use_container_width=True)
