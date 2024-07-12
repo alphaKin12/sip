@@ -55,7 +55,7 @@ if st.button("Calculate"):
     # Create DataFrame for plotting
     months = np.arange(1, investment_period * 12 + 1)
     invested_values = monthly_investment * months
-    future_values = [calculate_sip_returns(monthly_investment, m/12, expected_return_rate)[1] for m in months]
+    future_values = [calculate_sip_returns(monthly_investment, m/12, expected_return_rate,adjust_for_inflation)[1] for m in months]
     
     start_date = date.today()
     df = pd.DataFrame({
