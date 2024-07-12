@@ -100,7 +100,7 @@ if st.button("Calculate"):
     
     start_date = date.today()
     df = pd.DataFrame({
-        'Month': pd.date_range(start=start_date, periods=len(invested_values), freq='M'),
+        'Year': pd.date_range(start=start_date, periods=investment_period, freq='Y').year,
         'Invested Amount': invested_values,
         'Future Value': future_values
     })
@@ -109,7 +109,7 @@ if st.button("Calculate"):
     brush = alt.selection_interval(encodings=["x"])
     
     base = alt.Chart(df).encode(
-        x='Month:T',
+        x='Year:N',
         y=alt.Y('Amount:Q', axis=alt.Axis(title='Amount (₹)', format=',.0f'))
     ).properties(
         width=600,
@@ -135,30 +135,18 @@ if st.button("Calculate"):
     # Display the Altair chart with Streamlit theme
     st.altair_chart(chart, use_container_width=True)
     
-    # Create yearly breakdown data
-    if investment_type == "Monthly":
-        yearly_data = df[df.index % periods_per_year == 0].copy()
-    elif investment_type == "Quarterly":
-        yearly_data = df[df.index % (periods_per_year * 3) == 0].copy()
-    elif investment_type == "One-time":
-        yearly_data = df.copy()
-    
-    if investment_type == "One-time":
-        yearly_data['Year'] = pd.DatetimeIndex(yearly_data['Month']).year
-    else:
-        yearly_data['Year'] = yearly_data.index // periods_per_year + 1
-    
-    yearly_data = yearly_data[['Year', 'Invested Amount', 'Future Value']]
-    yearly_data = yearly_data.melt('Year', var_name='Category', value_name='Amount')
-
-    # Create Altair chart for bar plot
+    # Create Altair chart for bar plot (Yearly Breakdown)
     click = alt.selection_multi(encodings=['color'])
 
-    bars = alt.Chart(yearly_data).mark_bar().encode(
-        x='Year:O',
+    bars = alt.Chart(df).mark_bar().encode(
+        x='Year:N',
         y='Amount:Q',
-        color=alt.condition(click, 'Category:N', alt.value('lightgray')),
-        tooltip=['Year', 'Category', 'Amount']
+        color=alt.Color('Variable:N', scale=alt.Scale(domain=['Invested Amount', 'Future Value'],
+                                                      range=['#1f77b4', '#2ca02c'])),
+        tooltip=['Year', 'Variable', 'Amount']
+    ).transform_fold(
+        ['Invested Amount', 'Future Value'],
+        as_=['Variable', 'Amount']
     ).properties(
         width=600,
         height=400,
