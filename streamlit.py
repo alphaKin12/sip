@@ -18,7 +18,7 @@ st.markdown(
 )
 
 # Sliders for input
-monthly_investment = st.slider("Monthly Investment Amount (₹)", min_value=500, max_value=50000, value=2000, step=500)
+monthly_investment = st.slider("Investment Amount (₹)", min_value=500, max_value=50000, value=2000, step=500)
 investment_period = st.slider("Investment Period (Years)", min_value=2, max_value=30, value=4, step=1)
 expected_return_rate = st.slider("Expected Annual Return Rate (%)", min_value=6.0, max_value=25.0, value=12.0, step=0.1)
 adjust_for_inflation = st.checkbox("Adjust for Inflation (5% annually)")
@@ -52,7 +52,7 @@ def calculate_sip_quarterly(monthly_investment, investment_period, expected_retu
         quarterly_rate = (inflation_adjusted_rate / 100) / 4
     
     invested_amount = monthly_investment * quarters
-    future_value = monthly_investment * 3 * ((((1 + quarterly_rate) ** quarters) - 1) / quarterly_rate) * (1 + quarterly_rate)
+    future_value = monthly_investment  * ((((1 + quarterly_rate) ** quarters) - 1) / quarterly_rate) * (1 + quarterly_rate)
     
     return invested_amount, future_value
 
